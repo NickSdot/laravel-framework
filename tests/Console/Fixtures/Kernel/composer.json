@@ -1,0 +1,10 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Tests\\Console\\Fixtures\\Kernel\\App\\": "app/",
+            "Illuminate\\Tests\\Console\\Fixtures\\Kernel\\App\\Modules\\": "app/Modules/",
+            "Illuminate\\Tests\\Console\\Fixtures\\Kernel\\Domains\\": "Domains/",
+            "Illuminate\\Tests\\Console\\Fixtures\\Kernel\\Domains\\Console\\": "Domains/Console/"
+        }
+    }
+}

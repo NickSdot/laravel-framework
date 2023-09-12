@@ -338,10 +338,8 @@ class Kernel implements KernelContract
             return;
         }
 
-        $namespace = $this->app->getNamespace();
-
         foreach ((new Finder)->in($paths)->files() as $file) {
-            $command = $this->commandClassFromFile($file, $namespace);
+            $command = $this->commandClassFromFile($file);
 
             if (is_subclass_of($command, Command::class) &&
                 ! (new ReflectionClass($command))->isAbstract()) {
@@ -358,14 +356,65 @@ class Kernel implements KernelContract
      * @param  \SplFileInfo  $file
      * @param  string  $namespace
      * @return string
+     *
+     * @throws \RuntimeException
      */
-    protected function commandClassFromFile(SplFileInfo $file, string $namespace): string
+    protected function commandClassFromFile(SplFileInfo $file, string $namespace = ''): string
     {
-        return $namespace.str_replace(
-            ['/', '.php'],
-            ['\\', ''],
-            Str::after($file->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
+        if ($namespace) {
+            return $namespace . str_replace(
+                    ['/', '.php'],
+                    ['\\', ''],
+                    Str::after($file->getRealPath(), realpath(app_path()) . DIRECTORY_SEPARATOR)
+                );
+        }
+
+        // If no namespace is given, we detect it from the composer.json file in a
+        // similar way as getNamespace() in the Application class.
+
+        $namespaces = (array)data_get(
+            json_decode(file_get_contents($this->app->basePath('composer.json')), true),
+            'autoload.psr-4'
         );
+
+        // Sort by length of namespace, longest first. This ensures that always the most
+        // specific namespace is used. Additionally, we move the app/ namespace to the
+        // end, so that subnamespaces of app/ are preferred over the app/ namespace.
+
+        uasort($namespaces, function ($a, $b)
+        {
+            if ($a === 'app/') {
+                return 1;
+            }
+            if ($b === 'app/') {
+                return -1;
+            }
+
+            return strlen($b) - strlen($a);
+        });
+
+        $basePath = realpath(base_path()) . DIRECTORY_SEPARATOR;
+
+        $relativeCommandPath = str_replace(
+            [$basePath, '.php'],
+            '',
+            $file->getRealPath(),
+        );
+
+        foreach ($namespaces as $namespace => $path) {
+
+            if (!\str_starts_with($relativeCommandPath, $path)) {
+                continue;
+            }
+
+            return \str_replace(
+                [$path, '/'],
+                [$namespace, '\\'],
+                $relativeCommandPath
+            );
+        }
+
+        throw new \RuntimeException('Unable to detect command namespace.');
     }
 
     /**
