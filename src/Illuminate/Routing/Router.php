@@ -1066,15 +1066,45 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function pushMiddlewareToGroup($group, $middleware)
     {
-        if (! array_key_exists($group, $this->middlewareGroups)) {
-            $this->middlewareGroups[$group] = [];
-        }
+        $pocActive = false; // todo: set this 'true' and run tests with POC code
+        // when set to true, new tests in tests/Foundation/Http/KernelRouteGroupTest.php pass
+        // and some old  tests in /tests/Routing/RouteRegistrarTest.php fail.
 
-        if (! in_array($middleware, $this->middlewareGroups[$group])) {
-            $this->middlewareGroups[$group][] = $middleware;
-        }
+        if ($pocActive === true) {
 
-        return $this;
+            $kernelInterface = \Illuminate\Contracts\Console\Kernel::class;
+
+            if ($this->container && $this->container->bound($kernelInterface)) {
+                $kernel = $this->container->make($kernelInterface);
+                $kernel->appendMiddlewareToGroup($group, $middleware);
+            } else {
+
+                // tests in /tests/Routing/RouteRegistrarTest.php would fail,
+                // without this else condition.
+                if (!array_key_exists($group, $this->middlewareGroups)) {
+                    $this->middlewareGroups[$group] = [];
+                }
+
+                if (!in_array($middleware, $this->middlewareGroups[$group])) {
+                    $this->middlewareGroups[$group][] = $middleware;
+                }
+            }
+            return $this;
+
+
+        // original case
+        } else {
+            if (!array_key_exists($group, $this->middlewareGroups)) {
+                $this->middlewareGroups[$group] = [];
+            }
+
+            if (!in_array($middleware, $this->middlewareGroups[$group])) {
+                $this->middlewareGroups[$group][] = $middleware;
+            }
+
+
+            return $this;
+        }
     }
 
     /**
