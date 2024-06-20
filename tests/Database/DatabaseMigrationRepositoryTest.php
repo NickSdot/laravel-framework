@@ -23,6 +23,14 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $query = m::mock(stdClass::class);
         $connectionMock = m::mock(Connection::class);
+
+        // Mocking the getSchemaBuilder method
+        $schemaBuilder = m::mock('Illuminate\Database\Schema\Builder');
+        $connectionMock->shouldReceive('getSchemaBuilder')->andReturn($schemaBuilder);
+
+        // Mocking the hasTable method
+        $schemaBuilder->shouldReceive('hasTable')->with('migrations')->andReturn(true);
+
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
         $query->shouldReceive('orderBy')->once()->with('batch', 'asc')->andReturn($query);
@@ -41,6 +49,14 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo->expects($this->once())->method('getLastBatchNumber')->willReturn(1);
         $query = m::mock(stdClass::class);
         $connectionMock = m::mock(Connection::class);
+
+        // Mocking the getSchemaBuilder method
+        $schemaBuilder = m::mock('Illuminate\Database\Schema\Builder');
+        $connectionMock->shouldReceive('getSchemaBuilder')->andReturn($schemaBuilder);
+
+        // Mocking the hasTable method
+        $schemaBuilder->shouldReceive('hasTable')->with('migrations')->andReturn(true);
+
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
         $query->shouldReceive('where')->once()->with('batch', 1)->andReturn($query);
@@ -56,6 +72,14 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $query = m::mock(stdClass::class);
         $connectionMock = m::mock(Connection::class);
+
+        // Mocking the getSchemaBuilder method
+        $schemaBuilder = m::mock('Illuminate\Database\Schema\Builder');
+        $connectionMock->shouldReceive('getSchemaBuilder')->andReturn($schemaBuilder);
+
+        // Mocking the hasTable method
+        $schemaBuilder->shouldReceive('hasTable')->with('migrations')->andReturn(true);
+
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
         $query->shouldReceive('insert')->once()->with(['migration' => 'bar', 'batch' => 1]);
@@ -69,6 +93,14 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $query = m::mock(stdClass::class);
         $connectionMock = m::mock(Connection::class);
+
+        // Mocking the getSchemaBuilder method
+        $schemaBuilder = m::mock('Illuminate\Database\Schema\Builder');
+        $connectionMock->shouldReceive('getSchemaBuilder')->andReturn($schemaBuilder);
+
+        // Mocking the hasTable method
+        $schemaBuilder->shouldReceive('hasTable')->with('migrations')->andReturn(true);
+
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
         $query->shouldReceive('where')->once()->with('migration', 'foo')->andReturn($query);
@@ -94,6 +126,14 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $query = m::mock(stdClass::class);
         $connectionMock = m::mock(Connection::class);
+
+        // Mocking the getSchemaBuilder method
+        $schemaBuilder = m::mock('Illuminate\Database\Schema\Builder');
+        $connectionMock->shouldReceive('getSchemaBuilder')->andReturn($schemaBuilder);
+
+        // Mocking the hasTable method
+        $schemaBuilder->shouldReceive('hasTable')->with('migrations')->andReturn(true);
+
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
         $query->shouldReceive('max')->once()->andReturn(1);
@@ -107,6 +147,14 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $schema = m::mock(stdClass::class);
         $connectionMock = m::mock(Connection::class);
+
+        // Mocking the getSchemaBuilder method
+        $schemaBuilder = m::mock('Illuminate\Database\Schema\Builder');
+        $connectionMock->shouldReceive('getSchemaBuilder')->andReturn($schemaBuilder);
+
+        // Mocking the hasTable method
+        $schemaBuilder->shouldReceive('hasTable')->with('migrations')->andReturn(true);
+
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
         $repo->getConnection()->shouldReceive('getSchemaBuilder')->once()->andReturn($schema);
         $schema->shouldReceive('create')->once()->with('migrations', m::type(Closure::class));

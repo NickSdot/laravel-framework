@@ -203,7 +203,13 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     protected function table()
     {
-        return $this->getConnection()->table($this->table)->useWritePdo();
+        if($this->getConnection()->getSchemaBuilder()->hasTable($this->table)){
+            return $this->getConnection()->table($this->table)->useWritePdo();
+        }
+
+        return (clone $this->resolver)->connection(
+            $this->getConnectionResolver()->getDefaultConnection()
+        )->table($this->table)->useWritePdo();
     }
 
     /**
