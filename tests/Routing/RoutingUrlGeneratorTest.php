@@ -274,14 +274,11 @@ class RoutingUrlGeneratorTest extends TestCase
         $routes->add($route);
 
         /*
-         * Route name with string backed enum route
+         * With backed enum route
          */
         $route = (new Route(['GET'], 'enum/name', ['as' => 'prefixed.']))->name(RouteNameEnum::UserIndex);
         $routes->add($route);
 
-        /*
-         * Route domain with string backed enum
-         */
         $route = (new Route(['GET'], 'enum/domain', ['as' => 'domain.enum']))->domain(RouteDomainEnum::DashboardDomain);
         $routes->add($route);
 
