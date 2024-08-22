@@ -754,6 +754,8 @@ class Route
      *
      * @param  string|\BackedEnum|null  $domain
      * @return $this|string|null
+     *
+     * @throws \InvalidArgumentException
      */
     public function domain($domain = null)
     {
@@ -761,9 +763,11 @@ class Route
             return $this->getDomain();
         }
 
-        $parsed = RouteUri::parse(
-            $this->getStringFromStringBackedEnumOrString($domain)
-        );
+        if ($domain instanceof \BackedEnum && ! is_string($domain = $domain->value)) {
+            throw new \InvalidArgumentException('Enum must be string-backed.');
+        }
+
+        $parsed = RouteUri::parse($domain);
 
         $this->action['domain'] = $parsed->uri;
 
@@ -878,10 +882,14 @@ class Route
      *
      * @param  string|\BackedEnum  $name
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function name($name)
     {
-        $name = $this->getStringFromStringBackedEnumOrString($name);
+        if ($name instanceof \BackedEnum && ! is_string($name = $name->value)) {
+            throw new \InvalidArgumentException('Enum must be string-backed.');
+        }
 
         $this->action['as'] = isset($this->action['as']) ? $this->action['as'].$name : $name;
 
@@ -1367,21 +1375,6 @@ class Route
         $this->compileRoute();
 
         unset($this->router, $this->container);
-    }
-
-    private function getStringFromStringBackedEnumOrString(string|\BackedEnum $value): string
-    {
-        if (is_string($value)) {
-            return $value;
-        }
-
-        if ($value instanceof \BackedEnum) {
-            if (! is_string($value = $value->value)) {
-                throw new \InvalidArgumentException('Enum must be string-backed.');
-            }
-        }
-
-        return $value;
     }
 
     /**

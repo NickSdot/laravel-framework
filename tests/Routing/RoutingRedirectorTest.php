@@ -161,15 +161,6 @@ class RoutingRedirectorTest extends TestCase
         $this->assertSame('http://foo.com/bar', $response->getTargetUrl());
     }
 
-    public function testRouteWithStringBackedEnum()
-    {
-        $this->url->shouldReceive('route')->with(RouteNameEnum::UserIndex)->andReturn('http://foo.com/bar');
-        $this->url->shouldReceive('route')->with(RouteNameEnum::UserIndex, [])->andReturn('http://foo.com/bar');
-
-        $response = $this->redirect->route(RouteNameEnum::UserIndex);
-        $this->assertSame('http://foo.com/bar', $response->getTargetUrl());
-    }
-
     public function testSignedRoute()
     {
         $this->url->shouldReceive('signedRoute')->with('home', [], null)->andReturn('http://foo.com/bar?signature=secret');

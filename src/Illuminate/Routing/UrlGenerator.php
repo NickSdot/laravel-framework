@@ -496,14 +496,12 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  bool  $absolute
      * @return string
      *
-     * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException|\Illuminate\Routing\Exceptions\UrlGenerationException|\InvalidArgumentException
+     * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException|\InvalidArgumentException
      */
     public function route($name, $parameters = [], $absolute = true)
     {
-        if ($name instanceof BackedEnum) {
-            if (! is_string($name = $name->value)) {
-                throw new \InvalidArgumentException('Attribute [name] expects a string backed enum.');
-            }
+        if ($name instanceof \BackedEnum && ! is_string($name = $name->value)) {
+            throw new \InvalidArgumentException('Attribute [name] expects a string backed enum.');
         }
 
         if (! is_null($route = $this->routes->getByName($name))) {

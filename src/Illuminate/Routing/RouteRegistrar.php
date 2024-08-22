@@ -127,10 +127,8 @@ class RouteRegistrar
             );
         }
 
-        if ($value instanceof BackedEnum) {
-            if (! is_string($value = $value->value)) {
-                throw new InvalidArgumentException("Attribute [{$key}] expects a string backed enum.");
-            }
+        if ($value instanceof \BackedEnum && ! is_string($value = $value->value)) {
+            throw new \InvalidArgumentException("Attribute [{$key}] expects a string backed enum.");
         }
 
         $this->attributes[$attributeKey] = $value;
