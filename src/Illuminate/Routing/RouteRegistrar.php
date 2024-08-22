@@ -2,7 +2,6 @@
 
 namespace Illuminate\Routing;
 
-use BackedEnum;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Support\Arr;
