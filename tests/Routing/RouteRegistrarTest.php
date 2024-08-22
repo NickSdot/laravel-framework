@@ -1143,8 +1143,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCannotSetRouteDomainUsingIntegerBackedEnum()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Attribute [domain] expects a string backed enum.');
+        $this->expectExceptionObject(new \InvalidArgumentException('Attribute [domain] expects a string backed enum.'));
 
         $this->router->domain(IntegerEnum::One)->get('users', function () {
             return 'all-users';
