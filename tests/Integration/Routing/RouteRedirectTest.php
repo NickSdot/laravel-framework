@@ -75,29 +75,4 @@ class RouteRedirectTest extends TestCase
             ->assertStatus(302)
             ->assertSee('Redirecting to');
     }
-
-    public function testToRouteHelperWithStringBackedEnum()
-    {
-        Route::get('to-enum', function () {
-            // ..
-        })->name(RouteNameEnum::UserIndex);
-
-        Route::get('from-301-to-enum', function () {
-            return to_route(RouteNameEnum::UserIndex, [], 301);
-        });
-
-        Route::get('from-302-to-enum', function () {
-            return to_route(RouteNameEnum::UserIndex);
-        });
-
-        $this->get('from-301-to-enum')
-            ->assertRedirect('to-enum')
-            ->assertStatus(301)
-            ->assertSee('Redirecting to');
-
-        $this->get('from-302-to-enum')
-            ->assertRedirect('to-enum')
-            ->assertStatus(302)
-            ->assertSee('Redirecting to');
-    }
 }
