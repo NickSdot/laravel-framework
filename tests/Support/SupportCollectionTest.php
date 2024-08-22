@@ -1379,7 +1379,7 @@ class SupportCollectionTest extends TestCase
     public function testDiffUsingWithCollection($collection)
     {
         $c = new $collection(['en_GB', 'fr', 'HR']);
-        // demonstrate that diffKeys won't support case insensitivity
+        // demonstrate that diff won't support case insensitivity
         $this->assertEquals(['en_GB', 'fr', 'HR'], $c->diff(new $collection(['en_gb', 'hr']))->values()->toArray());
         // allow for case insensitive difference
         $this->assertEquals(['fr'], $c->diffUsing(new $collection(['en_gb', 'hr']), 'strcasecmp')->values()->toArray());
@@ -1720,6 +1720,20 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([new $collection([1, 2, 3]), new $collection([4, 5, 6])]);
         $this->assertEquals([1, 2, 3, 4, 5, 6], $data->collapse()->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testCollapseWithKeys($collection)
+    {
+        $data = new $collection([[1 => 'a'], [3 => 'c'], [2 => 'b'], 'drop']);
+        $this->assertEquals([1 => 'a', 3 => 'c', 2 => 'b'], $data->collapseWithKeys()->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testCollapseWithKeysOnNestedCollections($collection)
+    {
+        $data = new $collection([new $collection(['a' => '1a', 'b' => '1b']), new $collection(['b' => '2b', 'c' => '2c']), 'drop']);
+        $this->assertEquals(['a' => '1a', 'b' => '2b', 'c' => '2c'], $data->collapseWithKeys()->all());
     }
 
     #[DataProvider('collectionClassProvider')]

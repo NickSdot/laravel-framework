@@ -400,6 +400,14 @@ class SupportStrTest extends TestCase
         Str::convertCase('Hello', -1);
     }
 
+    public function testDedup()
+    {
+        $this->assertSame(' laravel php framework ', Str::deduplicate(' laravel   php  framework '));
+        $this->assertSame('what', Str::deduplicate('whaaat', 'a'));
+        $this->assertSame('/some/odd/path/', Str::deduplicate('/some//odd//path/', '/'));
+        $this->assertSame('ムだム', Str::deduplicate('ムだだム', 'だ'));
+    }
+
     public function testParseCallback()
     {
         $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method'));
@@ -596,15 +604,22 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('Laravel is...', Str::limit('Laravel is a free, open source PHP web application framework.', 10));
         $this->assertSame('这是一...', Str::limit('这是一段中文', 6));
+        $this->assertSame('Laravel is a...', Str::limit('Laravel is a free, open source PHP web application framework.', 15, preserveWords: true));
 
         $string = 'The PHP framework for web artisans.';
         $this->assertSame('The PHP...', Str::limit($string, 7));
+        $this->assertSame('The PHP...', Str::limit($string, 10, preserveWords: true));
         $this->assertSame('The PHP', Str::limit($string, 7, ''));
+        $this->assertSame('The PHP', Str::limit($string, 10, '', true));
         $this->assertSame('The PHP framework for web artisans.', Str::limit($string, 100));
+        $this->assertSame('The PHP framework for web artisans.', Str::limit($string, 100, preserveWords: true));
+        $this->assertSame('The PHP framework...', Str::limit($string, 20, preserveWords: true));
 
         $nonAsciiString = '这是一段中文';
         $this->assertSame('这是一...', Str::limit($nonAsciiString, 6));
+        $this->assertSame('这是一...', Str::limit($nonAsciiString, 6, preserveWords: true));
         $this->assertSame('这是一', Str::limit($nonAsciiString, 6, ''));
+        $this->assertSame('这是一', Str::limit($nonAsciiString, 6, '', true));
     }
 
     public function testLength()
@@ -1101,6 +1116,7 @@ class SupportStrTest extends TestCase
     {
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());
         $this->assertInstanceOf(UuidInterface::class, Str::orderedUuid());
+        $this->assertInstanceOf(UuidInterface::class, Str::uuid7());
     }
 
     public function testAsciiNull()
@@ -1354,7 +1370,7 @@ class SupportStrTest extends TestCase
     {
         Str::createUuidsUsingSequence([
             0 => ($zeroth = Str::uuid()),
-            1 => ($first = Str::uuid()),
+            1 => ($first = Str::uuid7()),
             // just generate a random one here...
             3 => ($third = Str::uuid()),
             // continue to generate random uuids...
@@ -1525,6 +1541,46 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('foo', Str::fromBase64(base64_encode('foo')));
         $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
+    }
+
+    public function testChopStart()
+    {
+        foreach ([
+            'http://laravel.com' => ['http://', 'laravel.com'],
+            'http://-http://' => ['http://', '-http://'],
+            'http://laravel.com' => ['htp:/', 'http://laravel.com'],
+            'http://laravel.com' => ['http://www.', 'http://laravel.com'],
+            'http://laravel.com' => ['-http://', 'http://laravel.com'],
+            'http://laravel.com' => [['https://', 'http://'], 'laravel.com'],
+            'http://www.laravel.com' => [['http://', 'www.'], 'www.laravel.com'],
+            'http://http-is-fun.test' => ['http://', 'http-is-fun.test'],
+            '🌊✋' => ['🌊', '✋'],
+            '🌊✋' => ['✋', '🌊✋'],
+        ] as $subject => $value) {
+            [$needle, $expected] = $value;
+
+            $this->assertSame($expected, Str::chopStart($subject, $needle));
+        }
+    }
+
+    public function testChopEnd()
+    {
+        foreach ([
+            'path/to/file.php' => ['.php', 'path/to/file'],
+            '.php-.php' => ['.php', '.php-'],
+            'path/to/file.php' => ['.ph', 'path/to/file.php'],
+            'path/to/file.php' => ['foo.php', 'path/to/file.php'],
+            'path/to/file.php' => ['.php-', 'path/to/file.php'],
+            'path/to/file.php' => [['.html', '.php'], 'path/to/file'],
+            'path/to/file.php' => [['.php', 'file'], 'path/to/file'],
+            'path/to/php.php' => ['.php', 'path/to/php'],
+            '✋🌊' => ['🌊', '✋'],
+            '✋🌊' => ['✋', '✋🌊'],
+        ] as $subject => $value) {
+            [$needle, $expected] = $value;
+
+            $this->assertSame($expected, Str::chopEnd($subject, $needle));
+        }
     }
 }
 
