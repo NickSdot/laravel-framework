@@ -65,6 +65,8 @@ namespace Illuminate\Support\Facades;
  * @method static string normalizeQueryString(string|null $qs)
  * @method static void enableHttpMethodParameterOverride()
  * @method static bool getHttpMethodParameterOverride()
+ * @method static void setAllowedHttpMethodOverride(array|null $methods)
+ * @method static array|null getAllowedHttpMethodOverride()
  * @method static bool hasPreviousSession()
  * @method static void setSession(\Symfony\Component\HttpFoundation\Session\SessionInterface $session)
  * @method static array getClientIps()
